@@ -1,5 +1,9 @@
 import React, {Component} from 'react';
-import {Form, Icon, Input, Button} from 'antd';
+import {Form, Icon, Input, Button, message} from 'antd';
+import {Redirect} from 'react-router-dom'
+import {reqLogin} from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
+import storageUtils from '../../utils/storageUtils'
 import './login.less'
 
 /*
@@ -13,14 +17,76 @@ class Login extends Component {
   handleSubmit = e => {
     e.preventDefault();
     // 得到form对象
-    const form = this.props.form;
+    // const form = this.props.form;
     // 用form对象中的方法获取两个表单的值，一个对象{username: "wenzehai", password: "123"}
-    const values = form.getFieldsValue();
+    // const values = form.getFieldsValue();
+
+    // 对所有的表单项进行验证
+    // async 放到函数定义的左侧
+    this.props.form.validateFields(async (err, values) => {
+      // 如果验证通过，对操作值进行处理
+      if (!err) {  // 向后台提交登陆ajax请求
+        const {username, password} = values;
+        // await的含义是等待，一直等到请求返回一个成功的数据
+        const result = await reqLogin(username, password);
+        // console.log('请求成功', response.data);
+        if(result.status === 0){  //登陆成功
+          message.success('登陆成功');
+          const user = result.data;
+          // 跳转之前保存user在内存中
+          memoryUtils.user = user;
+          // 还要存在storageUtil中
+          storageUtils.saveUser(user);
+
+          // 跳转到管理界面,所有的路由组件都有history属性，不需要再回退，所以用replace
+
+          this.props.history.replace('/');
+        } else {    //登陆失败
+          message.error(result.msg);
+        }
+      } else {
+        // 前台校验失败
+        console.log('校验失败')
+      }
+    });
   };
 
+  /*
+  * 对密码进行自定义验证
+  * */
+
+  validatePwd = (rule, value, callback) => {
+
+    if (!value) {               // 如果密码不存在
+      callback('请输入用密码');
+    } else if (value.length < 4) {       // 如果密码长度小于4
+      callback('密码长度需要大于4');
+    } else if (value.length > 12) {     // 如果密码长度大于12
+      callback('密码长度小于12');
+    } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+      callback('以字母、数字、下划线开头');
+    } else {
+      callback();
+    }
+    // 验证通过
+    // callback();
+    // 验证失败，并指定提示的文本
+    // callback('验证失败');
+  };
+
+
   render() {
+    // 如果用户已经登陆，自动跳转到管理界面
+    const user = memoryUtils.user;
+    if(user && user._id){
+      return <Redirect to='/admin'/>
+    }
+
+
+
+
     const form = this.props.form;
-    const { getFieldDecorator } = form;
+    const {getFieldDecorator} = form;
 
     return (
       <div className="login">
@@ -33,43 +99,41 @@ class Login extends Component {
             <Form onSubmit={this.handleSubmit} className="login-form">
               {/* getFieldDecorator里面的Input不是一个组件，而是一个组件标签 */}
               <Form.Item>
-                {getFieldDecorator('username',{
-                  rules:[
-                    {required:true,whitespace:true,message:'请输入用户名！'},
-                    {min:4,message:'请至少输入4位！'},
-                    {max:12,message:'最多输入12位！'},
-                    {whitespace:true,message:'请勿输入空格！'},
-                    {pattern:/^[a-zA-Z0-9_]+$/,message:'以字母、数字、下划线开头！'},
+                {getFieldDecorator('username', {
+                  // 声明式验证：直接使用别人定义好的验证规则进行验证
+                  rules: [
+                    {required: true, whitespace: true, message: '请输入用户名！'},
+                    {min: 4, message: '请至少输入4位！'},
+                    {max: 12, message: '最多输入12位！'},
+                    {whitespace: true, message: '请勿输入空格！'},
+                    {pattern: /^[a-zA-Z0-9_]+$/, message: '以字母、数字、下划线开头！'}
                   ]
                 })(
                   <Input
                     prefix={<Icon type="user" style={{color: 'rgba(0,0,0,.25)'}}/>}
-                    placeholder="Username"
+                    placeholder="请输入用户名"
                   />
                 )}
 
               </Form.Item>
               <Form.Item>
-                {getFieldDecorator('password',{
-                  // 声明式验证：直接使用别人定义好的验证规则进行验证
-                  rules:[
-                    {required:true,message:'请输入用户名！'},
-                    {min:4,message:'请至少输入4位！'},
-                    {max:12,message:'最多输入12位！'},
-                    {whitespace:true,message:'请勿输入空格！'},
-                    {pattern:/^[a-zA-Z0-9_]+$/,message:'以字母、数字、下划线开头！'},
+                {getFieldDecorator('password', {
+                  rules: [
+                    {
+                      validator: this.validatePwd
+                    }
                   ]
                 })(
                   <Input
                     prefix={<Icon type="lock" style={{color: 'rgba(0,0,0,.25)'}}/>}
                     type="password"
-                    placeholder="Password"
+                    placeholder="请输入密码"
                   />
                 )}
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit" className="login-form-button">
-                  Log in
+                  登陆
                 </Button>
               </Form.Item>
             </Form>
@@ -80,6 +144,7 @@ class Login extends Component {
     )
   }
 }
+
 /*
 * 1.高阶函数 create()
 *  1).一类特别的函数
@@ -103,4 +168,18 @@ class Login extends Component {
 * */
 const WrappedLogin = Form.create()(Login);
 
-export default WrappedLogin;
+export default WrappedLogin
+
+
+/*
+* async 和 await
+* 1.作用
+*   简化promise的使用，不用再使用then()来指定成功/失败的回调函数
+*   以同步编码方式实现异步流程，（一旦存在回调函数，就可以看作是异步编程）
+* 2.哪里写await？
+*   再返回的promise的表达式左侧写await：不想要promise，而想要promise异步执行成功返回的value数据
+* 3.哪里写async？
+*   await所在函数（最近的）定义的左侧写async
+*
+*
+* */;

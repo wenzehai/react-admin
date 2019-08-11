@@ -2,7 +2,7 @@
 * root component
 * */
 import React, {Component} from 'react';
-import { BrowserRouter, Switch, Redirect, Route } from 'react-router-dom'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
 import Login from './pages/login/login'
 import Admin from './pages/admin/admin'
@@ -16,7 +16,6 @@ class App extends Component {
           <Route path='/login' component={Login}/>
           <Route path='/' component={Admin}/>
         </Switch>
-
       </BrowserRouter>
 
 
