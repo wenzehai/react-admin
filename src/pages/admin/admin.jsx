@@ -1,9 +1,17 @@
 import React, {Component} from 'react';
-import {Redirect} from 'react-router-dom'
+import {Redirect, Route, Switch} from 'react-router-dom'
 import {Layout, Menu, Icon} from 'antd';
 import memoryUtils from '../../utils/memoryUtils'
 import LeftNav from '../../components/left-nav/left-nav'
 import SiteHeader from '../../components/site-header/site-header'
+import Home from '../../pages/home/home.jsx'
+import Category from '../../pages/category/category.jsx'
+import Product from '../../pages/product/product.jsx'
+import Role from '../../pages/role/role.jsx'
+import User from '../../pages/user/user.jsx'
+import Bar from '../../pages/charts/bar.jsx'
+import Line from '../../pages/charts/line.jsx'
+import Pie from '../../pages/charts/pie.jsx'
 
 const {Content, Footer, Sider} = Layout;
 /*
@@ -39,7 +47,21 @@ export default class Admin extends Component {
           <SiteHeader style={{background: '#fff', padding: 0}}/>
           <Content style={{margin: '24px 16px 0', overflow: 'initial'}}>
             <div style={{padding: 24, background: '#fff', textAlign: 'center'}}>
-              content
+              <Switch>
+                <Route path="/home" component={Home}/>
+                <Route path="/category" component={Category}/>
+                <Route path="/product" component={Product}/>
+                <Route path="/role" component={Role}/>
+                <Route path="/user" component={User}/>
+                <Route path="/charts/bar" component={Bar}/>
+                <Route path="/charts/line" component={Line}/>
+                <Route path="/charts/pie" component={Pie}/>
+                <Redirect to="/home"/>
+              </Switch>
+
+
+
+
             </div>
           </Content>
           <Footer style={{textAlign: 'center'}}>Ant Design ©2018 Created by Ant UED</Footer>
