@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {Redirect, Route, Switch} from 'react-router-dom'
-import {Layout, Menu, Icon} from 'antd';
+import {Layout} from 'antd';
 import memoryUtils from '../../utils/memoryUtils'
 import LeftNav from '../../components/left-nav/left-nav'
 import SiteHeader from '../../components/site-header/site-header'
@@ -46,7 +46,7 @@ export default class Admin extends Component {
         <Layout style={{marginLeft: 200, height: '100vh'}}>
           <SiteHeader style={{background: '#fff', padding: 0}}/>
           <Content style={{margin: '24px 16px 0', overflow: 'initial'}}>
-            <div style={{padding: 24, background: '#fff', textAlign: 'center'}}>
+            <div style={{padding: 24, background: '#fff'}}>
               <Switch>
                 <Route path="/home" component={Home}/>
                 <Route path="/category" component={Category}/>

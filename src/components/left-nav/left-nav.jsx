@@ -14,15 +14,16 @@ class LeftNav extends Component {
     /*
       * map方法的实现
       * */
-    {/*return menuList.map(item => {*/}
 
-      {/*if (item.children) {*/}
-        {/*return (*/}
+    //{/*return menuList.map(item => {*/}
+
+    //  {/*if (item.children) {*/}
+    //    {/*return (*/}
     //       <SubMenu
     //         key={item.key}
     //         title={
-              {/*<span>*/}
-                {/*<Icon type={item.icon}></Icon>*/}
+    //          {/*<span>*/}
+    //            {/*<Icon type={item.icon}></Icon>*/}
     //             <span>{item.title}</span>
     //           </span>
     //         }>
@@ -76,7 +77,7 @@ class LeftNav extends Component {
       <div className="left-nav">
         <Link to='/'>
           <div className="logo-wrap">
-            <img className='logo' src={img}/>
+            <img alt="img" className='logo' src={img}/>
             <h2>电商平台</h2>
           </div>
         </Link>
